@@ -2,7 +2,6 @@ package dev.mmiv.clinic.service;
 
 import dev.mmiv.clinic.entity.Users;
 import dev.mmiv.clinic.repository.UsersRepository;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
@@ -33,7 +32,7 @@ public class UsersService {
                 authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(user.getUsername(), user.getPassword()));
 
         if(authentication.isAuthenticated()) {
-            return jwtService.generateToken();
+            return jwtService.generateToken(user.getUsername());
         }
         else {
             return "Login Failed";

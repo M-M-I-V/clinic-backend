@@ -20,9 +20,8 @@ public class UsersController {
     }
 
     @PostMapping("auth/login")
-    public ResponseEntity<String> login(@RequestBody Users user) {
-        usersService.verifyUser(user);
-        return ResponseEntity.ok().build();
+    public String login(@RequestBody Users user) {
+        return usersService.verifyUser(user);
     }
 
     @PostMapping("admin/add-user")
