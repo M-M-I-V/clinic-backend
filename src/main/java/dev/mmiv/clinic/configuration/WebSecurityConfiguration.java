@@ -1,5 +1,6 @@
 package dev.mmiv.clinic.configuration;
 
+import dev.mmiv.clinic.filter.JWTFilter;
 import dev.mmiv.clinic.service.CustomUserDetailsService;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;

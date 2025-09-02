@@ -1,4 +1,4 @@
-package dev.mmiv.clinic.configuration;
+package dev.mmiv.clinic.filter;
 
 import dev.mmiv.clinic.service.CustomUserDetailsService;
 import dev.mmiv.clinic.service.JWTService;

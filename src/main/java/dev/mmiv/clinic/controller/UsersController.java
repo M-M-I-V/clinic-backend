@@ -10,7 +10,7 @@ import org.springframework.web.server.ResponseStatusException;
 import java.util.List;
 
 @RestController
-@RequestMapping("api/")
+@RequestMapping("api/admin")
 public class UsersController {
 
     UsersService usersService;
@@ -19,23 +19,18 @@ public class UsersController {
         this.usersService = usersService;
     }
 
-    @PostMapping("auth/login")
-    public String login(@RequestBody Users user) {
-        return usersService.verifyUser(user);
-    }
-
-    @PostMapping("admin/add-user")
+    @PostMapping("/add-user")
     public ResponseEntity<String> addUser(@RequestBody Users user) {
         usersService.createUser(user);
         return ResponseEntity.ok().build();
     }
 
-    @GetMapping("admin/users")
+    @GetMapping("/users")
     public ResponseEntity<List<Users>> getUsers() {
         return new ResponseEntity<>(usersService.getUsers(), HttpStatus.OK);
     }
 
-    @GetMapping("admin/users/{id}")
+    @GetMapping("/users/{id}")
     public ResponseEntity<Users> getUserById(@PathVariable int id) {
         return new ResponseEntity<>(usersService.findUserById(id), HttpStatus.OK);
     }
@@ -47,7 +42,7 @@ public class UsersController {
         return ResponseEntity.ok().build();
     }
 
-    @DeleteMapping("admin/delete-user/{id}")
+    @DeleteMapping("/delete-user/{id}")
     public ResponseEntity<String> deleteUser(@PathVariable int id) {
         try {
             usersService.deleteUserById(id);
