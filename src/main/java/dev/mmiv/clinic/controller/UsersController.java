@@ -11,6 +11,7 @@ import java.util.List;
 
 @RestController
 @RequestMapping("api/admin")
+@CrossOrigin
 public class UsersController {
 
     UsersService usersService;
@@ -32,13 +33,12 @@ public class UsersController {
 
     @GetMapping("/users/{id}")
     public ResponseEntity<Users> getUserById(@PathVariable int id) {
-        return new ResponseEntity<>(usersService.findUserById(id), HttpStatus.OK);
+        return new ResponseEntity<>(usersService.getUserById(id), HttpStatus.OK);
     }
 
     @PutMapping("/update-user/{id}")
     public ResponseEntity<String> updateUser(@PathVariable int id, @RequestBody Users user) {
         usersService.updateUser(user);
-
         return ResponseEntity.ok().build();
     }
 
@@ -47,11 +47,11 @@ public class UsersController {
         try {
             usersService.deleteUserById(id);
             return ResponseEntity.ok().build();
-        }
-        catch(IllegalArgumentException e) {
+
+        } catch(IllegalArgumentException e) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, e.getMessage(), e.getCause());
-        }
-        catch(Exception e) {
+
+        } catch(Exception e) {
             throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, e.getMessage(), e.getCause());
         }
     }

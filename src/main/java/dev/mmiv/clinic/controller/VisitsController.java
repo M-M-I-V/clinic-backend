@@ -1,0 +1,25 @@
+package dev.mmiv.clinic.controller;
+
+import dev.mmiv.clinic.entity.Visits;
+import dev.mmiv.clinic.service.VisitsService;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RestController;
+
+import java.util.List;
+
+@RestController
+public class VisitsController {
+
+    VisitsService visitsService;
+
+    public VisitsController(VisitsService visitsService) {
+        this.visitsService = visitsService;
+    }
+
+    @GetMapping("/visits")
+    public ResponseEntity<List<Visits>> getVisits() {
+        return new ResponseEntity<>(visitsService.getVisits(), HttpStatus.OK);
+    }
+}
