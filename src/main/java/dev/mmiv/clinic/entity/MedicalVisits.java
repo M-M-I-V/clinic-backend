@@ -13,7 +13,7 @@ import lombok.Setter;
 @Getter
 public class MedicalVisits extends Visits {
 
-    private boolean hama;
-    private boolean referralForm;
+    private String hama;
+    private String referralForm;
     private String medicalChartImage;
 }
