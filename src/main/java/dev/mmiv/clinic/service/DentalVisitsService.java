@@ -72,7 +72,7 @@ public class DentalVisitsService {
         dentalVisits.setDiagnosis(diagnosis);
         dentalVisits.setPlan(plan);
         dentalVisits.setTreatment(treatment);
-        dentalVisits.setMedicalChartImage("http://localhost:8080/uploads/" + fileName);
+        dentalVisits.setDentalChartImage("http://localhost:8080/uploads/" + fileName);
         dentalVisitsRepository.save(dentalVisits);
     }
 
@@ -129,7 +129,7 @@ public class DentalVisitsService {
             String uploadPath = uploadDir + "/" + fileName;
             multipartFile.transferTo(new File(uploadPath));
 
-            dentalVisits.setMedicalChartImage("http://localhost:8080/uploads/" + fileName);
+            dentalVisits.setDentalChartImage("http://localhost:8080/uploads/" + fileName);
         }
         dentalVisitsRepository.save(dentalVisits);
     }
