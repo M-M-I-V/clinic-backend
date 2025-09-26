@@ -39,7 +39,8 @@ public class DentalVisitsService {
                                     String physicalExamFindings,
                                     String diagnosis,
                                     String plan,
-                                    String treatment) throws IOException {
+                                    String treatment,
+                                    int patientId) throws IOException {
 
         String rootPath = System.getProperty("user.dir");
         String uploadDir = rootPath + "/uploads";
@@ -72,6 +73,7 @@ public class DentalVisitsService {
         dentalVisits.setDiagnosis(diagnosis);
         dentalVisits.setPlan(plan);
         dentalVisits.setTreatment(treatment);
+        dentalVisits.setPatientId(patientId);
         dentalVisits.setDentalChartImage("http://localhost:8080/uploads/" + fileName);
         dentalVisitsRepository.save(dentalVisits);
     }
@@ -99,7 +101,8 @@ public class DentalVisitsService {
                                     String physicalExamFindings,
                                     String diagnosis,
                                     String plan,
-                                    String treatment) throws IOException {
+                                    String treatment
+                                    int patientId) throws IOException {
 
         DentalVisits dentalVisits = dentalVisitsRepository.findById(id)
                 .orElse(null);
@@ -118,6 +121,7 @@ public class DentalVisitsService {
         dentalVisits.setDiagnosis(diagnosis);
         dentalVisits.setPlan(plan);
         dentalVisits.setTreatment(treatment);
+        dentalVisits.setPatientId(patientId);
 
         if (multipartFile != null && !multipartFile.isEmpty()) {
             String rootPath = System.getProperty("user.dir");
