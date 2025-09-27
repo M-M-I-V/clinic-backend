@@ -6,6 +6,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.server.ResponseStatusException;
+import org.springframework.security.access.prepost.PreAuthorize;
 
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
@@ -25,11 +26,13 @@ public class MedicalVisitsController {
     }
 
     @GetMapping("/medical-visits")
+    @PreAuthorize("hasAnyRole('MD', 'DMD', 'NURSE')")
     public ResponseEntity<List<MedicalVisits>> getMedicalVisits() {
         return new ResponseEntity<>(medicalVisitsService.getMedicalVisits(), HttpStatus.OK);
     }
 
     @GetMapping("/medical-visits/{id}")
+    @PreAuthorize("hasAnyRole('MD', 'DMD', 'NURSE')")
     public ResponseEntity<MedicalVisits> getMedicalVisitById(@PathVariable int id) {
         MedicalVisits medicalVisits = medicalVisitsService.getMedicalVisitById(id);
         
@@ -39,6 +42,7 @@ public class MedicalVisitsController {
     }
     
     @PostMapping("/add-medical-visit")
+    @PreAuthorize("hasRole('MD')")
     public ResponseEntity<String> createMedicalVisits (
             @RequestParam("multipartFile") MultipartFile multipartFile,
             @RequestParam("visitDate") String visitDate,
@@ -120,6 +124,7 @@ public class MedicalVisitsController {
     } */
     
     @PutMapping("/update-medical-visit/{id}")
+    @PreAuthorize("hasRole('MD')")
     public ResponseEntity<String> createMedicalVisits (
             @PathVariable int id,
             @RequestParam("multipartFile") MultipartFile multipartFile,
@@ -185,6 +190,7 @@ public class MedicalVisitsController {
     }
 
     @DeleteMapping("/delete-medical-visit/{id}")
+    @PreAuthorize("hasRole('MD')")
     public ResponseEntity<String> deleteMedicalVisitById(@PathVariable int id) {
         try {
             medicalVisitsService.deleteMedicalVisits(id);
