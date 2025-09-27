@@ -6,6 +6,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.server.ResponseStatusException;
+import org.springframework.security.access.prepost.PreAuthorize;
 
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
@@ -25,11 +26,13 @@ public class DentalVisitsController {
     }
 
     @GetMapping("/dental-visits")
+    @PreAuthorize("hasAnyRole('MD', 'DMD', 'NURSE')")
     public ResponseEntity<List<DentalVisits>> getDentalVisits() {
         return new ResponseEntity<>(dentalVisitsService.getDentalVisits(), HttpStatus.OK);
     }
 
     @GetMapping("/dental-visits/{id}")
+    @PreAuthorize("hasAnyRole('MD', 'DMD', 'NURSE')")
     public ResponseEntity<DentalVisits> getDentalVisitById(@PathVariable int id) {
         DentalVisits dentalVisits = dentalVisitsService.getDentalVisitById(id);
         
@@ -39,6 +42,7 @@ public class DentalVisitsController {
     }
     
     @PostMapping("/add-dental-visit")
+    @PreAuthorize("hasRole('DMD')")
     public ResponseEntity<String> createDentalVisits (
             @RequestParam("multipartFile") MultipartFile multipartFile,
             @RequestParam("visitDate") String visitDate,
@@ -51,7 +55,7 @@ public class DentalVisitsController {
             @RequestParam(value = "spo2", required = false) String spo2,
             @RequestParam(value = "history", required = false) String history,
             @RequestParam(value = "symptoms", required = false) String symptoms,
-            @RequestParam(value = "physicalExamFindings", required = false) String physicalExamFindings,
+            @RequestParam(value = "physicalExamFindings", required = false) String physicalExamFindings
             @RequestParam(value = "diagnosis", required = false) String diagnosis,
             @RequestParam(value = "plan", required = false) String plan,
             @RequestParam(value = "treatment", required = false) String treatment,
@@ -120,6 +124,7 @@ public class DentalVisitsController {
     } */
     
     @PutMapping("/update-dental-visit/{id}")
+    @PreAuthorize("hasRole('DMD')")
     public ResponseEntity<String> createDentalVisits (
             @PathVariable int id,
             @RequestParam("multipartFile") MultipartFile multipartFile,
@@ -185,6 +190,7 @@ public class DentalVisitsController {
     }
 
     @DeleteMapping("/delete-dental-visit/{id}")
+    @PreAuthorize("hasRole('DMD')")
     public ResponseEntity<String> deleteDentalVisitById(@PathVariable int id) {
         try {
             dentalVisitsService.deleteDentalVisits(id);
