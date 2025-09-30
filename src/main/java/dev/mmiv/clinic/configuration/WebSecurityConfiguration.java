@@ -32,7 +32,7 @@ public class WebSecurityConfiguration {
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         http.authorizeHttpRequests((requests) -> requests
-                .requestMatchers("api/auth/**")
+                .requestMatchers("/api/auth/**")
                 .permitAll()
                 .anyRequest().authenticated());
         http.sessionManagement(session -> session
