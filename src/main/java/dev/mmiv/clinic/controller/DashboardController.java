@@ -1,5 +1,6 @@
 package dev.mmiv.clinic.controller;
 
+import dev.mmiv.clinic.service.DashboardService;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;

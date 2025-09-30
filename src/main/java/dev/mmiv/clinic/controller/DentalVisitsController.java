@@ -5,11 +5,11 @@ import dev.mmiv.clinic.service.DentalVisitsService;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.server.ResponseStatusException;
 import org.springframework.security.access.prepost.PreAuthorize;
 
 import java.time.LocalDate;
-import java.time.format.DateTimeFormatter;
 import java.time.format.DateTimeParseException;
 
 import java.util.List;
@@ -55,13 +55,11 @@ public class DentalVisitsController {
             @RequestParam(value = "spo2", required = false) String spo2,
             @RequestParam(value = "history", required = false) String history,
             @RequestParam(value = "symptoms", required = false) String symptoms,
-            @RequestParam(value = "physicalExamFindings", required = false) String physicalExamFindings
+            @RequestParam(value = "physicalExamFindings", required = false) String physicalExamFindings,
             @RequestParam(value = "diagnosis", required = false) String diagnosis,
             @RequestParam(value = "plan", required = false) String plan,
             @RequestParam(value = "treatment", required = false) String treatment,
-            @RequestParam("patientId") int patientId,
-            @RequestParam("hama") String hama,
-            @RequestParam("referralForm") String referralForm
+            @RequestParam("patientId") int patientId
     ) {
         try {
             // Convert String -> LocalDate (frontend should send in "yyyy-MM-dd" format)
@@ -88,9 +86,7 @@ public class DentalVisitsController {
                     diagnosis,
                     plan,
                     treatment,
-                    patientId,
-                    hama,
-                    referralForm
+                    patientId
             );
 
             String msg = String.format("Visit added for patient ID %d on %s (%s)", 
@@ -125,7 +121,7 @@ public class DentalVisitsController {
     
     @PutMapping("/update-dental-visit/{id}")
     @PreAuthorize("hasRole('DMD')")
-    public ResponseEntity<String> createDentalVisits (
+    public ResponseEntity<String> updateDentalVisits (
             @PathVariable int id,
             @RequestParam("multipartFile") MultipartFile multipartFile,
             @RequestParam("visitDate") String visitDate,
@@ -142,9 +138,7 @@ public class DentalVisitsController {
             @RequestParam(value = "diagnosis", required = false) String diagnosis,
             @RequestParam(value = "plan", required = false) String plan,
             @RequestParam(value = "treatment", required = false) String treatment,
-            @RequestParam("patientId") int patientId,
-            @RequestParam("hama") String hama,
-            @RequestParam("referralForm") String referralForm
+            @RequestParam("patientId") int patientId
     ) {
         try {
             // Convert String -> LocalDate (frontend should send in "yyyy-MM-dd" format)
@@ -171,9 +165,7 @@ public class DentalVisitsController {
                     diagnosis,
                     plan,
                     treatment,
-                    patientId,
-                    hama,
-                    referralForm
+                    patientId
             );
 
             return ResponseEntity.ok("Medical visit successfully updated.");
