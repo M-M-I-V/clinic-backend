@@ -11,7 +11,7 @@ import org.springframework.security.access.prepost.PreAuthorize;
 import java.util.List;
 
 @RestController
-@RequestMapping("api/")
+@RequestMapping("/api")
 @CrossOrigin
 public class PatientsController {
 
@@ -47,7 +47,7 @@ public class PatientsController {
         return ResponseEntity.ok().build();
     }
 
-    @DeleteMapping("delete-patient/{id}")
+    @DeleteMapping("/delete-patient/{id}")
     @PreAuthorize("hasAnyRole('MD', 'DMD', 'NURSE')")
     public ResponseEntity<String> deletePatient(@PathVariable int id) {
         try {

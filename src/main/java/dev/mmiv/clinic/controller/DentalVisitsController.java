@@ -1,6 +1,7 @@
 package dev.mmiv.clinic.controller;
 
 import dev.mmiv.clinic.entity.DentalVisits;
+import dev.mmiv.clinic.entity.VisitType;
 import dev.mmiv.clinic.service.DentalVisitsService;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -62,18 +63,16 @@ public class DentalVisitsController {
             @RequestParam("patientId") int patientId
     ) {
         try {
-            // Convert String -> LocalDate (frontend should send in "yyyy-MM-dd" format)
-            LocalDate parsedVisitDate = LocalDate.parse(visitDate);
-
-            Double parsedTemperature = (temperature != null && !temperature.isBlank()) ? Double.parseDouble(temperature) : null;
-            Integer parsedPulseRate = (pulseRate != null && !pulseRate.isBlank()) ? Integer.parseInt(pulseRate) : null;
-            Integer parsedRespiratoryRate = (respiratoryRate != null && !respiratoryRate.isBlank()) ? Integer.parseInt(respiratoryRate) : null;
-            Double parsedSpo2 = (spo2 != null && !spo2.isBlank()) ? Double.parseDouble(spo2) : null;
+            LocalDate parsedVisitDate = parseDate(visitDate);
+            Double parsedTemperature = parseDouble(temperature, "temperature");
+            Integer parsedPulseRate = parseInteger(pulseRate, "pulseRate");
+            Integer parsedRespiratoryRate = parseInteger(respiratoryRate, "respiratoryRate");
+            Double parsedSpo2 = parseDouble(spo2, "spo2");
 
             dentalVisitsService.createDentalVisits(
                     multipartFile,
                     parsedVisitDate,
-                    visitType,
+                    VisitType.valueOf(visitType),
                     chiefComplaint,
                     parsedTemperature,
                     bloodPressure,
@@ -141,18 +140,17 @@ public class DentalVisitsController {
             @RequestParam("patientId") int patientId
     ) {
         try {
-            // Convert String -> LocalDate (frontend should send in "yyyy-MM-dd" format)
-            LocalDate parsedVisitDate = LocalDate.parse(visitDate);
+            LocalDate parsedVisitDate = parseDate(visitDate);
+            Double parsedTemperature = parseDouble(temperature, "temperature");
+            Integer parsedPulseRate = parseInteger(pulseRate, "pulseRate");
+            Integer parsedRespiratoryRate = parseInteger(respiratoryRate, "respiratoryRate");
+            Double parsedSpo2 = parseDouble(spo2, "spo2");
 
-            Double parsedTemperature = (temperature != null && !temperature.isBlank()) ? Double.parseDouble(temperature) : null;
-            Integer parsedPulseRate = (pulseRate != null && !pulseRate.isBlank()) ? Integer.parseInt(pulseRate) : null;
-            Integer parsedRespiratoryRate = (respiratoryRate != null && !respiratoryRate.isBlank()) ? Integer.parseInt(respiratoryRate) : null;
-            Double parsedSpo2 = (spo2 != null && !spo2.isBlank()) ? Double.parseDouble(spo2) : null;
-
-            dentalVisitsService.createDentalVisits(
+            dentalVisitsService.updateDentalVisits(
+                    id,
                     multipartFile,
                     parsedVisitDate,
-                    visitType,
+                    VisitType.valueOf(visitType),
                     chiefComplaint,
                     parsedTemperature,
                     bloodPressure,
@@ -179,6 +177,36 @@ public class DentalVisitsController {
         } catch (Exception e) {
             throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "Unexpected error occurred", e);
         }
+    }
+
+    private LocalDate parseDate(String visitDate) {
+        try {
+            return LocalDate.parse(visitDate);
+        } catch (DateTimeParseException e) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Invalid date format. Use yyyy-MM-dd", e);
+        }
+    }
+
+    private Double parseDouble(String value, String fieldName) {
+        if (value != null && !value.isBlank()) {
+            try {
+                return Double.parseDouble(value);
+            } catch (NumberFormatException e) {
+                throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Invalid number format for " + fieldName, e);
+            }
+        }
+        return null;
+    }
+
+    private Integer parseInteger(String value, String fieldName) {
+        if (value != null && !value.isBlank()) {
+            try {
+                return Integer.parseInt(value);
+            } catch (NumberFormatException e) {
+                throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Invalid number format for " + fieldName, e);
+            }
+        }
+        return null;
     }
 
     @DeleteMapping("/delete-dental-visit/{id}")

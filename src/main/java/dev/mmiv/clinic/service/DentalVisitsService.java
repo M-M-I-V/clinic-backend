@@ -18,7 +18,7 @@ import java.util.List;
 @Service
 public class DentalVisitsService {
 
-    private final PatientsRepository patientsRepository;
+    PatientsRepository patientsRepository;
     DentalVisitsRepository dentalVisitsRepository;
 
     public DentalVisitsService(DentalVisitsRepository dentalVisitsRepository, PatientsRepository patientsRepository) {
@@ -57,27 +57,27 @@ public class DentalVisitsService {
         return dentalVisitsRepository.findById(id).orElse(null);
     }
 
-    public DentalVisits updateDentalVisits(int id,
-                                           MultipartFile multipartFile,
-                                           LocalDate visitDate,
-                                           VisitType visitType,
-                                           String chiefComplaint,
-                                           Double temperature,
-                                           String bloodPressure,
-                                           Integer pulseRate,
-                                           Integer respiratoryRate,
-                                           Double spo2,
-                                           String history,
-                                           String symptoms,
-                                           String physicalExamFindings,
-                                           String diagnosis,
-                                           String plan,
-                                           String treatment,
-                                           int patientId) throws IOException {
+    public void updateDentalVisits(int id,
+                                   MultipartFile multipartFile,
+                                   LocalDate visitDate,
+                                   VisitType visitType,
+                                   String chiefComplaint,
+                                   Double temperature,
+                                   String bloodPressure,
+                                   Integer pulseRate,
+                                   Integer respiratoryRate,
+                                   Double spo2,
+                                   String history,
+                                   String symptoms,
+                                   String physicalExamFindings,
+                                   String diagnosis,
+                                   String plan,
+                                   String treatment,
+                                   int patientId) throws IOException {
 
         DentalVisits dentalVisits = dentalVisitsRepository.findById(id)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Dental Visit not found"));
-        return saveOrUpdateDentalVisit(dentalVisits, multipartFile, visitDate, visitType,
+        saveOrUpdateDentalVisit(dentalVisits, multipartFile, visitDate, visitType,
                 chiefComplaint, temperature, bloodPressure, pulseRate, respiratoryRate,
                 spo2, history, symptoms, physicalExamFindings, diagnosis, plan, treatment, patientId);
     }
@@ -99,23 +99,23 @@ public class DentalVisitsService {
         return null;
     }
 
-    private DentalVisits saveOrUpdateDentalVisit(DentalVisits dentalVisits,
-                                                 MultipartFile multipartFile,
-                                                 LocalDate visitDate,
-                                                 VisitType visitType,
-                                                 String chiefComplaint,
-                                                 Double temperature,
-                                                 String bloodPressure,
-                                                 Integer pulseRate,
-                                                 Integer respiratoryRate,
-                                                 Double spo2,
-                                                 String history,
-                                                 String symptoms,
-                                                 String physicalExamFindings,
-                                                 String diagnosis,
-                                                 String plan,
-                                                 String treatment,
-                                                 int patientId) throws IOException {
+    private void saveOrUpdateDentalVisit(DentalVisits dentalVisits,
+                                         MultipartFile multipartFile,
+                                         LocalDate visitDate,
+                                         VisitType visitType,
+                                         String chiefComplaint,
+                                         Double temperature,
+                                         String bloodPressure,
+                                         Integer pulseRate,
+                                         Integer respiratoryRate,
+                                         Double spo2,
+                                         String history,
+                                         String symptoms,
+                                         String physicalExamFindings,
+                                         String diagnosis,
+                                         String plan,
+                                         String treatment,
+                                         int patientId) throws IOException {
 
         Patients patients = patientsRepository.findById(patientId)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Patient not found"));
@@ -141,7 +141,7 @@ public class DentalVisitsService {
             dentalVisits.setDentalChartImage(imageFile);
         }
 
-        return dentalVisitsRepository.save(dentalVisits);
+        dentalVisitsRepository.save(dentalVisits);
     }
 
     public void deleteDentalVisits(int id) {

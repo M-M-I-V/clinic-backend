@@ -11,15 +11,15 @@ import java.util.List;
 @Repository
 public interface VisitsRepository extends JpaRepository<Visits, Integer>, JpaSpecificationExecutor<Visits> {
   
-  @Query("SELECT COUNT(v) FROM Visit v WHERE DATE(v.date) = CURRENT_DATE")
+  @Query("SELECT COUNT(v) FROM Visits v WHERE DATE(v.visitDate) = CURRENT_DATE")
     long countTodayVisits();
 
-    @Query("SELECT COUNT(v) FROM Visit v WHERE MONTH(v.date) = MONTH(CURRENT_DATE) AND YEAR(v.date) = YEAR(CURRENT_DATE)")
+    @Query("SELECT COUNT(v) FROM Visits v WHERE MONTH(v.visitDate) = MONTH(CURRENT_DATE) AND YEAR(v.visitDate) = YEAR(CURRENT_DATE)")
     long countMonthVisits();
 
-    @Query("SELECT v.diagnosis, COUNT(v) FROM Visit v WHERE MONTH(v.date) = MONTH(CURRENT_DATE) AND YEAR(v.date) = YEAR(CURRENT_DATE) GROUP BY v.diagnosis ORDER BY COUNT(v) DESC")
+    @Query("SELECT v.diagnosis, COUNT(v) FROM Visits v WHERE MONTH(v.visitDate) = MONTH(CURRENT_DATE) AND YEAR(v.visitDate) = YEAR(CURRENT_DATE) GROUP BY v.diagnosis ORDER BY COUNT(v) DESC")
     List<Object[]> countTopDiagnosesThisMonth();
 
-    @Query("SELECT DATE(v.date), COUNT(v) FROM Visit v WHERE v.date >= CURRENT_DATE - 30 GROUP BY DATE(v.date) ORDER BY DATE(v.date)")
+    @Query("SELECT DATE(v.visitDate), COUNT(v) FROM Visits v WHERE v.visitDate >= CURRENT_DATE - 30 GROUP BY DATE(v.visitDate) ORDER BY DATE(v.visitDate)")
     List<Object[]> countVisitsTrendLast30Days();
 }

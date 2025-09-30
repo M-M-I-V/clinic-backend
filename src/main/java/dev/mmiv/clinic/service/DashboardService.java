@@ -11,23 +11,23 @@ import java.util.Map;
 @RequiredArgsConstructor
 public class DashboardService {
 
-    private final VisitRepository visitRepository;
+    private final VisitsRepository visitsRepository;
 
     public Map<String, Long> getKpis() {
         return Map.of(
-            "todayVisits", visitRepository.countTodayVisits(),
-            "monthVisits", visitRepository.countMonthVisits()
+            "todayVisits", visitsRepository.countTodayVisits(),
+            "monthVisits", visitsRepository.countMonthVisits()
         );
     }
 
     public List<Map<String, Object>> getTopDiagnoses() {
-        return visitRepository.countTopDiagnosesThisMonth().stream()
+        return visitsRepository.countTopDiagnosesThisMonth().stream()
                 .map(r -> Map.of("diagnosis", r[0], "count", r[1]))
                 .toList();
     }
 
     public List<Map<String, Object>> getVisitsTrend() {
-        return visitRepository.countVisitsTrendLast30Days().stream()
+        return visitsRepository.countVisitsTrendLast30Days().stream()
                 .map(r -> Map.of("date", r[0], "count", r[1]))
                 .toList();
     }

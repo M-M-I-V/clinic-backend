@@ -5,7 +5,7 @@ import dev.mmiv.clinic.service.UsersService;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
-@RequestMapping("api/auth")
+@RequestMapping("/api/auth")
 @CrossOrigin
 public class AuthController {
 
