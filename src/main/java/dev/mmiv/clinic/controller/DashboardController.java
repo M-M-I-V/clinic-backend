@@ -1,6 +1,9 @@
 package dev.mmiv.clinic.controller;
 
+import dev.mmiv.clinic.dto.DiagnosisStats;
+import dev.mmiv.clinic.dto.VisitTrend;
 import dev.mmiv.clinic.service.DashboardService;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
@@ -19,19 +22,19 @@ public class DashboardController {
 
     @GetMapping("/kpis")
     @PreAuthorize("hasAnyRole('MD', 'DMD', 'NURSE')")
-    public Map<String, Long> getKpis() {
-        return dashboardService.getKpis();
+    public ResponseEntity<Map<String, Long>> getKpis() {
+        return ResponseEntity.ok(dashboardService.getKpis());
     }
 
     @GetMapping("/top-diagnoses")
     @PreAuthorize("hasAnyRole('MD', 'DMD', 'NURSE')")
-    public List<Map<String, Object>> getTopDiagnoses() {
-        return dashboardService.getTopDiagnoses();
+    public ResponseEntity<List<DiagnosisStats>> getTopDiagnoses() {
+        return ResponseEntity.ok(dashboardService.getTopDiagnoses());
     }
 
     @GetMapping("/visits-trend")
     @PreAuthorize("hasAnyRole('MD', 'DMD', 'NURSE')")
-    public List<Map<String, Object>> getVisitsTrend() {
-        return dashboardService.getVisitsTrend();
+    public ResponseEntity<List<VisitTrend>> getVisitsTrend() {
+        return ResponseEntity.ok(dashboardService.getVisitsTrend());
     }
 }

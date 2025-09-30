@@ -8,18 +8,29 @@ import org.springframework.stereotype.Repository;
 
 import java.util.List;
 
+import java.time.LocalDate;
+
 @Repository
 public interface VisitsRepository extends JpaRepository<Visits, Integer>, JpaSpecificationExecutor<Visits> {
   
-  @Query("SELECT COUNT(v) FROM Visits v WHERE DATE(v.visitDate) = CURRENT_DATE")
-    long countTodayVisits();
+  @Query("SELECT COUNT(v) FROM Visits v WHERE v.visitDate = CURRENT_DATE")
+  long countTodayVisits();
 
-    @Query("SELECT COUNT(v) FROM Visits v WHERE MONTH(v.visitDate) = MONTH(CURRENT_DATE) AND YEAR(v.visitDate) = YEAR(CURRENT_DATE)")
-    long countMonthVisits();
+  @Query("SELECT COUNT(v) FROM Visits v WHERE FUNCTION('MONTH', v.visitDate) = FUNCTION('MONTH', CURRENT_DATE) AND FUNCTION('YEAR', v.visitDate) = FUNCTION('YEAR', CURRENT_DATE)")
+  long countMonthVisits();
 
-    @Query("SELECT v.diagnosis, COUNT(v) FROM Visits v WHERE MONTH(v.visitDate) = MONTH(CURRENT_DATE) AND YEAR(v.visitDate) = YEAR(CURRENT_DATE) GROUP BY v.diagnosis ORDER BY COUNT(v) DESC")
-    List<Object[]> countTopDiagnosesThisMonth();
+  @Query("SELECT v.diagnosis, COUNT(v) " +
+          "FROM Visits v " +
+          "WHERE FUNCTION('MONTH', v.visitDate) = FUNCTION('MONTH', CURRENT_DATE) " +
+          "AND FUNCTION('YEAR', v.visitDate) = FUNCTION('YEAR', CURRENT_DATE) " +
+          "GROUP BY v.diagnosis " +
+          "ORDER BY COUNT(v) DESC")
+  List<Object[]> countTopDiagnosesThisMonth();
 
-    @Query("SELECT DATE(v.visitDate), COUNT(v) FROM Visits v WHERE v.visitDate >= CURRENT_DATE - 30 GROUP BY DATE(v.visitDate) ORDER BY DATE(v.visitDate)")
-    List<Object[]> countVisitsTrendLast30Days();
+  @Query("SELECT v.visitDate, COUNT(v) " +
+          "FROM Visits v " +
+          "WHERE v.visitDate >= :cutoffDate " +
+          "GROUP BY v.visitDate " +
+          "ORDER BY v.visitDate")
+  List<Object[]> countVisitsTrendLast30Days(LocalDate cutoffDate);
 }
