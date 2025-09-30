@@ -6,6 +6,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.server.ResponseStatusException;
+import org.springframework.security.access.prepost.PreAuthorize;
 
 import java.util.List;
 
@@ -21,28 +22,33 @@ public class PatientsController {
     }
 
     @PostMapping("/add-patient")
+    @PreAuthorize("hasAnyRole('MD', 'DMD', 'NURSE')")
     public ResponseEntity<String> createPatient(Patients patient) {
         patientsService.createPatient(patient);
         return ResponseEntity.ok().build();
     }
 
     @GetMapping("/patients")
+    @PreAuthorize("hasAnyRole('MD', 'DMD', 'NURSE')")
     public ResponseEntity<List<Patients>> getAllPatients() {
         return new ResponseEntity<>(patientsService.getPatients(), HttpStatus.OK);
     }
 
     @GetMapping("/patients/{id}")
+    @PreAuthorize("hasAnyRole('MD', 'DMD', 'NURSE')")
     public ResponseEntity<Patients> getAllPatientsByName(@PathVariable int id) {
         return new ResponseEntity<>(patientsService.getPatientById(id), HttpStatus.OK);
     }
 
     @PutMapping("/update-patient/{id}")
+    @PreAuthorize("hasAnyRole('MD', 'DMD', 'NURSE')")
     public ResponseEntity<String> updatePatient(@PathVariable int id, @RequestBody Patients patient) {
         patientsService.updatePatient(patient);
         return ResponseEntity.ok().build();
     }
 
     @DeleteMapping("delete-patient/{id}")
+    @PreAuthorize("hasAnyRole('MD', 'DMD', 'NURSE')")
     public ResponseEntity<String> deletePatient(@PathVariable int id) {
         try {
             patientsService.deletePatient(id);

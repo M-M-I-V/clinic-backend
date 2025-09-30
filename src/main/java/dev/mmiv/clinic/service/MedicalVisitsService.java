@@ -40,6 +40,7 @@ public class MedicalVisitsService {
                                     String diagnosis,
                                     String plan,
                                     String treatment,
+                                    int patientId,
                                     String hama,
                                     String referralForm) throws IOException {
 
@@ -74,6 +75,7 @@ public class MedicalVisitsService {
         medicalVisits.setDiagnosis(diagnosis);
         medicalVisits.setPlan(plan);
         medicalVisits.setTreatment(treatment);
+        medicalVisits.setPatientId(patientId);
         medicalVisits.setHama(hama);
         medicalVisits.setReferralForm(referralForm);
         medicalVisits.setMedicalChartImage("http://localhost:8080/uploads/" + fileName);
@@ -104,6 +106,7 @@ public class MedicalVisitsService {
                                     String diagnosis,
                                     String plan,
                                     String treatment,
+                                    int patientId,
                                     String hama,
                                     String referralForm) throws IOException {
 
@@ -124,6 +127,7 @@ public class MedicalVisitsService {
         medicalVisits.setDiagnosis(diagnosis);
         medicalVisits.setPlan(plan);
         medicalVisits.setTreatment(treatment);
+        medicalVisits.setPatientId(patientId);
         medicalVisits.setHama(hama);
         medicalVisits.setReferralForm(referralForm);
 
