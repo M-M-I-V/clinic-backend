@@ -1,6 +1,7 @@
 package dev.mmiv.clinic.service;
 
 import dev.mmiv.clinic.entity.Patients;
+import dev.mmiv.clinic.dto.PatientList;
 import dev.mmiv.clinic.repository.PatientsRepository;
 import org.springframework.stereotype.Service;
 
@@ -17,6 +18,19 @@ public class PatientsService {
 
     public void createPatient(Patients patient) {
         patientsRepository.save(patient);
+    }
+
+    public List<PatientList> getPatientsList() {
+        return patientsRepository.findAll().stream()
+                .map(patient -> new PatientList(
+                        patient.getId(),
+                        patient.getFullName(),
+                        patient.getStudentId(),
+                        patient.getGender(),
+                        patient.getProgram(),
+                        patient.getKnownDiseases()
+                ))
+                .toList();
     }
 
     public List<Patients> getPatients() {

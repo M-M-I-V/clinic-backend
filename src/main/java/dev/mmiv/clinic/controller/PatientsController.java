@@ -1,5 +1,6 @@
 package dev.mmiv.clinic.controller;
 
+import dev.mmiv.clinic.dto.PatientList;
 import dev.mmiv.clinic.entity.Patients;
 import dev.mmiv.clinic.service.PatientsService;
 import org.springframework.http.HttpStatus;
@@ -26,6 +27,12 @@ public class PatientsController {
     public ResponseEntity<String> createPatient(Patients patient) {
         patientsService.createPatient(patient);
         return ResponseEntity.ok().build();
+    }
+
+    @GetMapping("/patients-list")
+    @PreAuthorize("hasAnyRole('MD', 'DMD', 'NURSE')")
+    public ResponseEntity<List<PatientList>> getPatientsList() {
+        return new ResponseEntity<>(patientsService.getPatientsList(), HttpStatus.OK);
     }
 
     @GetMapping("/patients")

@@ -28,13 +28,18 @@ public class UsersService {
     BCryptPasswordEncoder bCryptPasswordEncoder = new BCryptPasswordEncoder(10);
 
     public String verifyUser(Users user) {
-        Authentication authentication =
-                authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(user.getUsername(), user.getPassword()));
+        Authentication authentication = authenticationManager.authenticate(
+                new UsernamePasswordAuthenticationToken(user.getUsername(), user.getPassword())
+        );
 
-        if(authentication.isAuthenticated()) {
-            return jwtService.generateToken(user.getUsername());
-        }
-        else {
+        if (authentication.isAuthenticated()) {
+            // Fetch full user from DB so we also get the role
+            Users dbUser = usersRepository.findByUsername(user.getUsername());
+            if (dbUser == null) {
+                throw new RuntimeException("User not found");
+            }
+            return jwtService.generateToken(dbUser);
+        } else {
             return "Login Failed";
         }
     }

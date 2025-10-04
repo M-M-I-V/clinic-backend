@@ -1,5 +1,7 @@
 package dev.mmiv.clinic.service;
 
+import dev.mmiv.clinic.entity.Users;
+
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.io.Decoders;
@@ -33,13 +35,14 @@ public class JWTService {
         }
     }
 
-    public String generateToken(String username) {
+    public String generateToken(Users user) {
         Map<String, Object> claims = new HashMap<>();
+        claims.put("role", user.getRole());
 
         return Jwts.builder()
                 .claims()
                 .add(claims)
-                .subject(username)
+                .subject(user.getUsername())
                 .issuedAt(new Date(System.currentTimeMillis()))
                 .expiration(new Date(System.currentTimeMillis() + 1000 * 60 * 60 * 8))
                 .and()
