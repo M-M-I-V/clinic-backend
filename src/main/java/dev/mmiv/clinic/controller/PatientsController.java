@@ -1,19 +1,23 @@
 package dev.mmiv.clinic.controller;
 
+import dev.mmiv.clinic.dto.PatientDTO;
 import dev.mmiv.clinic.dto.PatientList;
 import dev.mmiv.clinic.entity.Patients;
 import dev.mmiv.clinic.service.PatientsService;
+import jakarta.servlet.http.HttpServletResponse;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.server.ResponseStatusException;
 import org.springframework.security.access.prepost.PreAuthorize;
 
+import java.io.IOException;
 import java.util.List;
 
 @RestController
 @RequestMapping("/api")
-@CrossOrigin
+@CrossOrigin(origins = "http://localhost:3000", allowCredentials = "true")
 public class PatientsController {
 
     PatientsService patientsService;
@@ -24,9 +28,9 @@ public class PatientsController {
 
     @PostMapping("/add-patient")
     @PreAuthorize("hasAnyRole('MD', 'DMD', 'NURSE')")
-    public ResponseEntity<String> createPatient(Patients patient) {
-        patientsService.createPatient(patient);
-        return ResponseEntity.ok().build();
+    public ResponseEntity<String> createPatient(@RequestBody PatientDTO dto) {
+        patientsService.createPatient(dto);
+        return ResponseEntity.ok("Patient created successfully");
     }
 
     @GetMapping("/patients-list")
@@ -49,9 +53,9 @@ public class PatientsController {
 
     @PutMapping("/update-patient/{id}")
     @PreAuthorize("hasAnyRole('MD', 'DMD', 'NURSE')")
-    public ResponseEntity<String> updatePatient(@PathVariable int id, @RequestBody Patients patient) {
-        patientsService.updatePatient(patient);
-        return ResponseEntity.ok().build();
+    public ResponseEntity<String> updatePatient(@PathVariable int id, @RequestBody PatientDTO dto) {
+        patientsService.updatePatient(id, dto);
+        return ResponseEntity.ok("Patient updated successfully");
     }
 
     @DeleteMapping("/delete-patient/{id}")
@@ -67,5 +71,23 @@ public class PatientsController {
         } catch(Exception e) {
             throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, e.getMessage(), e.getCause());
         }
+    }
+
+    @PostMapping("/patients/import")
+    @PreAuthorize("hasAnyRole('MD', 'DMD', 'NURSE')")
+    public ResponseEntity<String> importPatients(@RequestParam("file") MultipartFile file) {
+        try {
+            patientsService.importPatientsFromCsv(file);
+            return ResponseEntity.ok("Patients imported successfully.");
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Import failed: " + e.getMessage());
+        }
+    }
+
+    @GetMapping(value = "/patients/export", produces = "text/csv")
+    @PreAuthorize("hasAnyRole('MD', 'DMD', 'NURSE')")
+    public void exportPatients(HttpServletResponse response) throws IOException {
+        response.setHeader("Content-Disposition", "attachment; filename=patients.csv");
+        patientsService.exportPatients(response);
     }
 }

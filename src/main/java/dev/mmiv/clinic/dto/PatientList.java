@@ -2,9 +2,9 @@ package dev.mmiv.clinic.dto;
 
 public record PatientList(
         int id,
-        String fullName,
-        String studentId,
+        String firstName,
+        String lastName,
+        String studentNumber,
         String gender,
-        String program,
-        String knownDiseases
+        String status
 ) {}
