@@ -1,5 +1,6 @@
 package dev.mmiv.clinic.controller;
 
+import dev.mmiv.clinic.dto.VisitsList;
 import dev.mmiv.clinic.entity.Visits;
 import dev.mmiv.clinic.service.VisitsService;
 import org.springframework.http.HttpStatus;
@@ -23,5 +24,11 @@ public class VisitsController {
     @PreAuthorize("hasAnyRole('MD', 'DMD', 'NURSE')")
     public ResponseEntity<List<Visits>> getVisits() {
         return new ResponseEntity<>(visitsService.getVisits(), HttpStatus.OK);
+    }
+
+    @GetMapping
+    @PreAuthorize("hasAnyRole('MD', 'DMD', 'NURSE')")
+    public ResponseEntity<List<VisitsList>> getVisitsList() {
+        return ResponseEntity.ok(visitsService.getVisitsList());
     }
 }

@@ -23,10 +23,10 @@ public abstract class Visits {
     private LocalDate visitDate;
 
     @Enumerated(EnumType.STRING)
-    private VisitType visitType;
+    private VisitType visitType; // MEDICAL, DENTAL
 
     @Column(nullable = false)
-    private String chiefComplaint;
+    private String chiefComplaint; // Reason for visit
 
     private Double temperature;
     private String bloodPressure;

@@ -102,22 +102,7 @@ public class DentalVisitsController {
             throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "Unexpected error occurred", e);
         }
     }
-    
-    /* private static LocalDate getLocalDate(String visitDate) {
-        LocalDate parsedVisitDate = null;
-        
-        if(visitDate != null && !visitDate.isBlank()) {
-            try {
-                DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
-                parsedVisitDate = LocalDate.parse(visitDate, formatter);
-                
-            } catch(DateTimeParseException e) {
-                throw new IllegalArgumentException("Invalid date format. Please use YYYY-MM-DD format");
-            }
-        }
-        return parsedVisitDate;
-    } */
-    
+
     @PutMapping("/update-dental-visit/{id}")
     @PreAuthorize("hasRole('DMD')")
     public ResponseEntity<String> updateDentalVisits (
