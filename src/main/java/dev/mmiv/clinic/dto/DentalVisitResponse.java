@@ -2,7 +2,7 @@ package dev.mmiv.clinic.dto;
 
 import java.time.LocalDate;
 
-public record VisitResponse(
+public record DentalVisitResponse(
         int id,
         LocalDate visitDate,
         String visitType,
@@ -18,9 +18,7 @@ public record VisitResponse(
         String diagnosis,
         String plan,
         String treatment,
-        String hama,
-        String referralForm,
-        String medicalChartImage,
+        String dentalChartImage,
         String fullName,
         LocalDate birthDate
 ) {}

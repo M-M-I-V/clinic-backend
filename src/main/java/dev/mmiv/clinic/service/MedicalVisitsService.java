@@ -1,7 +1,7 @@
 package dev.mmiv.clinic.service;
 
 import dev.mmiv.clinic.dto.MedicalVisitRequest;
-import dev.mmiv.clinic.dto.VisitResponse;
+import dev.mmiv.clinic.dto.MedicalVisitResponse;
 import dev.mmiv.clinic.entity.MedicalVisits;
 import dev.mmiv.clinic.entity.Patients;
 import dev.mmiv.clinic.entity.VisitType;
@@ -39,11 +39,11 @@ public class MedicalVisitsService {
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Medical visit not found"));
     }
 
-    public VisitResponse getMedicalVisitResponseById(int id) {
+    public MedicalVisitResponse getMedicalVisitResponseById(int id) {
         MedicalVisits visit = getMedicalVisitById(id);
         Patients p = visit.getPatient();
 
-        return new VisitResponse(
+        return new MedicalVisitResponse(
                 visit.getId(),
                 visit.getVisitDate(),
                 visit.getVisitType().name(),

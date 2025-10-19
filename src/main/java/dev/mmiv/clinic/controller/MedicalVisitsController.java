@@ -1,7 +1,7 @@
 package dev.mmiv.clinic.controller;
 
 import dev.mmiv.clinic.dto.MedicalVisitRequest;
-import dev.mmiv.clinic.dto.VisitResponse;
+import dev.mmiv.clinic.dto.MedicalVisitResponse;
 import dev.mmiv.clinic.entity.MedicalVisits;
 import dev.mmiv.clinic.service.MedicalVisitsService;
 import lombok.RequiredArgsConstructor;
@@ -29,8 +29,8 @@ public class MedicalVisitsController {
 
     @GetMapping("/{id}")
     @PreAuthorize("hasAnyRole('MD', 'DMD', 'NURSE')")
-    public ResponseEntity<VisitResponse> getMedicalVisitById(@PathVariable int id) {
-        VisitResponse response = medicalVisitsService.getMedicalVisitResponseById(id);
+    public ResponseEntity<MedicalVisitResponse> getMedicalVisitById(@PathVariable int id) {
+        MedicalVisitResponse response = medicalVisitsService.getMedicalVisitResponseById(id);
         return ResponseEntity.ok(response);
     }
 
