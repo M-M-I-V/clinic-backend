@@ -30,7 +30,7 @@ public class DentalVisitsController {
 
     @GetMapping("/{id}")
     @PreAuthorize("hasAnyRole('MD', 'DMD', 'NURSE')")
-    public ResponseEntity<DentalVisitResponse> getMedicalVisitById(@PathVariable int id) {
+    public ResponseEntity<DentalVisitResponse> getDentalVisitById(@PathVariable int id) {
         DentalVisitResponse response = dentalVisitsService.getDentalVisitResponseById(id);
         return ResponseEntity.ok(response);
     }
