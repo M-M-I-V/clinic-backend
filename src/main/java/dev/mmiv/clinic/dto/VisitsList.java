@@ -4,8 +4,12 @@ import java.time.LocalDate;
 
 public record VisitsList(
         int id,
+        String fullName,
+        LocalDate birthDate,
         LocalDate visitDate,
         String visitType,
-        String chiefComplaint,
-        String diagnosis
+        String symptoms,
+        String physicalExamFindings,
+        String diagnosis,
+        String treatment
 ) {}

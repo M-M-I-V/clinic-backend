@@ -1,5 +1,7 @@
 package dev.mmiv.clinic.service;
 
+import dev.mmiv.clinic.dto.MedicalVisitRequest;
+import dev.mmiv.clinic.dto.VisitResponse;
 import dev.mmiv.clinic.entity.MedicalVisits;
 import dev.mmiv.clinic.entity.Patients;
 import dev.mmiv.clinic.entity.VisitType;
@@ -13,43 +15,19 @@ import org.springframework.web.server.ResponseStatusException;
 import java.io.File;
 import java.io.IOException;
 import java.time.LocalDate;
+import java.time.format.DateTimeParseException;
 import java.util.List;
 
 @Service
 public class MedicalVisitsService {
 
-    MedicalVisitsRepository medicalVisitsRepository;
-    PatientsRepository patientsRepository;
+    private final MedicalVisitsRepository medicalVisitsRepository;
+    private final PatientsRepository patientsRepository;
 
-    public MedicalVisitsService(MedicalVisitsRepository medicalVisitsRepository, PatientsRepository patientsRepository) {
+    public MedicalVisitsService(MedicalVisitsRepository medicalVisitsRepository,
+                                PatientsRepository patientsRepository) {
         this.medicalVisitsRepository = medicalVisitsRepository;
         this.patientsRepository = patientsRepository;
-    }
-
-    public void createMedicalVisits(MultipartFile multipartFile,
-                                    LocalDate visitDate,
-                                    VisitType visitType,
-                                    String chiefComplaint,
-                                    Double temperature,
-                                    String bloodPressure,
-                                    int pulseRate,
-                                    int respiratoryRate,
-                                    Double spo2,
-                                    String history,
-                                    String symptoms,
-                                    String physicalExamFindings,
-                                    String diagnosis,
-                                    String plan,
-                                    String treatment,
-                                    int patientId,
-                                    String hama,
-                                    String referralForm) throws IOException {
-
-        MedicalVisits medicalVisits = new MedicalVisits();
-        saveOrUpdateMedicalVisit(medicalVisits, multipartFile, visitDate, visitType,
-                chiefComplaint, temperature, bloodPressure, pulseRate, respiratoryRate,
-                spo2, history, symptoms, physicalExamFindings, diagnosis, plan, treatment, patientId,
-                hama, referralForm);
     }
 
     public List<MedicalVisits> getMedicalVisits() {
@@ -57,35 +35,94 @@ public class MedicalVisitsService {
     }
 
     public MedicalVisits getMedicalVisitById(int id) {
-        return medicalVisitsRepository.findById(id).orElse(null);
+        return medicalVisitsRepository.findById(id)
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Medical visit not found"));
     }
 
-    public void updateMedicalVisits(int id,
-                                    MultipartFile multipartFile,
-                                    LocalDate visitDate,
-                                    VisitType visitType,
-                                    String chiefComplaint,
-                                    Double temperature,
-                                    String bloodPressure,
-                                    int pulseRate,
-                                    int respiratoryRate,
-                                    Double spo2,
-                                    String history,
-                                    String symptoms,
-                                    String physicalExamFindings,
-                                    String diagnosis,
-                                    String plan,
-                                    String treatment,
-                                    int patientId,
-                                    String hama,
-                                    String referralForm) throws IOException {
+    public VisitResponse getMedicalVisitResponseById(int id) {
+        MedicalVisits visit = getMedicalVisitById(id);
+        Patients p = visit.getPatient();
 
+        return new VisitResponse(
+                visit.getId(),
+                visit.getVisitDate(),
+                visit.getVisitType().name(),
+                visit.getChiefComplaint(),
+                visit.getTemperature(),
+                visit.getBloodPressure(),
+                visit.getPulseRate(),
+                visit.getRespiratoryRate(),
+                visit.getSpo2(),
+                visit.getHistory(),
+                visit.getSymptoms(),
+                visit.getPhysicalExamFindings(),
+                visit.getDiagnosis(),
+                visit.getPlan(),
+                visit.getTreatment(),
+                visit.getHama(),
+                visit.getReferralForm(),
+                visit.getMedicalChartImage(),
+                p.getFirstName() + " " + p.getLastName(),
+                p.getBirthDate()
+        );
+    }
+
+    public void createMedicalVisits(MultipartFile multipartFile, MedicalVisitRequest dto) throws IOException {
+        MedicalVisits medicalVisits = new MedicalVisits();
+        saveOrUpdateMedicalVisit(medicalVisits, multipartFile, dto);
+    }
+
+    public void updateMedicalVisits(int id, MultipartFile multipartFile, MedicalVisitRequest dto) throws IOException {
         MedicalVisits medicalVisits = medicalVisitsRepository.findById(id)
-                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Medical Visit not found"));
-        saveOrUpdateMedicalVisit(medicalVisits, multipartFile, visitDate, visitType,
-                chiefComplaint, temperature, bloodPressure, pulseRate, respiratoryRate,
-                spo2, history, symptoms, physicalExamFindings, diagnosis, plan, treatment, patientId,
-                hama, referralForm);
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Medical visit not found"));
+        saveOrUpdateMedicalVisit(medicalVisits, multipartFile, dto);
+    }
+
+    public void deleteMedicalVisits(int id) {
+        if (medicalVisitsRepository.existsById(id)) {
+            medicalVisitsRepository.deleteById(id);
+        } else {
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Medical visit not found");
+        }
+    }
+
+    private void saveOrUpdateMedicalVisit(MedicalVisits medicalVisits,
+                                          MultipartFile multipartFile,
+                                          MedicalVisitRequest dto) throws IOException {
+        try {
+            Patients patient = patientsRepository.findById(dto.getPatientId())
+                    .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Patient not found"));
+
+            medicalVisits.setVisitDate(LocalDate.parse(dto.getVisitDate()));
+            medicalVisits.setVisitType(VisitType.valueOf(dto.getVisitType().toUpperCase()));
+            medicalVisits.setChiefComplaint(dto.getChiefComplaint());
+            medicalVisits.setTemperature(parseDouble(dto.getTemperature()));
+            medicalVisits.setBloodPressure(dto.getBloodPressure());
+            medicalVisits.setPulseRate(parseInt(dto.getPulseRate()));
+            medicalVisits.setRespiratoryRate(parseInt(dto.getRespiratoryRate()));
+            medicalVisits.setSpo2(parseDouble(dto.getSpo2()));
+            medicalVisits.setHistory(dto.getHistory());
+            medicalVisits.setSymptoms(dto.getSymptoms());
+            medicalVisits.setPhysicalExamFindings(dto.getPhysicalExamFindings());
+            medicalVisits.setDiagnosis(dto.getDiagnosis());
+            medicalVisits.setPlan(dto.getPlan());
+            medicalVisits.setTreatment(dto.getTreatment());
+            medicalVisits.setHama(dto.getHama());
+            medicalVisits.setReferralForm(dto.getReferralForm());
+            medicalVisits.setPatient(patient);
+
+            String imageFile = saveUploadedFile(multipartFile);
+            if (imageFile != null) {
+                medicalVisits.setMedicalChartImage(imageFile);
+            }
+
+            medicalVisitsRepository.save(medicalVisits);
+
+        } catch (DateTimeParseException e) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Invalid date format. Use yyyy-MM-dd", e);
+        } catch (IllegalArgumentException e) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Invalid visit type: " + dto.getVisitType(), e);
+        }
     }
 
     private String saveUploadedFile(MultipartFile multipartFile) throws IOException {
@@ -105,58 +142,21 @@ public class MedicalVisitsService {
         return null;
     }
 
-    private void saveOrUpdateMedicalVisit(MedicalVisits medicalVisits,
-                                          MultipartFile multipartFile,
-                                          LocalDate visitDate,
-                                          VisitType visitType,
-                                          String chiefComplaint,
-                                          Double temperature,
-                                          String bloodPressure,
-                                          Integer pulseRate,
-                                          Integer respiratoryRate,
-                                          Double spo2,
-                                          String history,
-                                          String symptoms,
-                                          String physicalExamFindings,
-                                          String diagnosis,
-                                          String plan,
-                                          String treatment,
-                                          int patientId,
-                                          String hama,
-                                          String referralForm) throws IOException {
-
-        Patients patients = patientsRepository.findById(patientId)
-                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Patient not found"));
-
-        medicalVisits.setVisitDate(visitDate);
-        medicalVisits.setVisitType(visitType);
-        medicalVisits.setChiefComplaint(chiefComplaint);
-        medicalVisits.setTemperature(temperature);
-        medicalVisits.setBloodPressure(bloodPressure);
-        medicalVisits.setPulseRate(pulseRate);
-        medicalVisits.setRespiratoryRate(respiratoryRate);
-        medicalVisits.setSpo2(spo2);
-        medicalVisits.setHistory(history);
-        medicalVisits.setSymptoms(symptoms);
-        medicalVisits.setPhysicalExamFindings(physicalExamFindings);
-        medicalVisits.setDiagnosis(diagnosis);
-        medicalVisits.setPlan(plan);
-        medicalVisits.setTreatment(treatment);
-        medicalVisits.setPatient(patients);
-        medicalVisits.setHama(hama);
-        medicalVisits.setReferralForm(referralForm);
-
-        String imageFile = saveUploadedFile(multipartFile);
-        if (imageFile != null) {
-            medicalVisits.setMedicalChartImage(imageFile);
+    private Double parseDouble(String value) {
+        if (value == null || value.isBlank()) return null;
+        try {
+            return Double.parseDouble(value);
+        } catch (NumberFormatException e) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Invalid numeric value: " + value);
         }
-
-        medicalVisitsRepository.save(medicalVisits);
     }
 
-    public void deleteMedicalVisits(int id) {
-        if(medicalVisitsRepository.existsById(id)) {
-            medicalVisitsRepository.deleteById(id);
+    private Integer parseInt(String value) {
+        if (value == null || value.isBlank()) return null;
+        try {
+            return Integer.parseInt(value);
+        } catch (NumberFormatException e) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Invalid integer value: " + value);
         }
     }
 }

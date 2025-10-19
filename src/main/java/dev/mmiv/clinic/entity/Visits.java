@@ -1,5 +1,6 @@
 package dev.mmiv.clinic.entity;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -52,6 +53,7 @@ public abstract class Visits {
     @Column(columnDefinition = "TEXT")
     private String treatment;
 
+    @JsonIgnore
     @ManyToOne
     @JoinColumn(name = "patient_id", nullable = false)
     private Patients patient;

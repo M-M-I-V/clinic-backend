@@ -3,6 +3,7 @@ package dev.mmiv.clinic.controller;
 import dev.mmiv.clinic.entity.DentalVisits;
 import dev.mmiv.clinic.entity.VisitType;
 import dev.mmiv.clinic.service.DentalVisitsService;
+import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -16,23 +17,20 @@ import java.time.format.DateTimeParseException;
 import java.util.List;
 
 @RestController
-@RequestMapping("/api/visits")
-@CrossOrigin
+@RequestMapping("/api/visits/dental")
+@RequiredArgsConstructor
+@CrossOrigin(origins = "http://localhost:3000", allowCredentials = "true")
 public class DentalVisitsController {
 
     DentalVisitsService dentalVisitsService;
 
-    DentalVisitsController(DentalVisitsService dentalVisitsService) {
-        this.dentalVisitsService = dentalVisitsService;
-    }
-
-    @GetMapping("/dental-visits")
+    @GetMapping
     @PreAuthorize("hasAnyRole('MD', 'DMD', 'NURSE')")
     public ResponseEntity<List<DentalVisits>> getDentalVisits() {
         return new ResponseEntity<>(dentalVisitsService.getDentalVisits(), HttpStatus.OK);
     }
 
-    @GetMapping("/dental-visits/{id}")
+    @GetMapping("/{id}")
     @PreAuthorize("hasAnyRole('MD', 'DMD', 'NURSE')")
     public ResponseEntity<DentalVisits> getDentalVisitById(@PathVariable int id) {
         DentalVisits dentalVisits = dentalVisitsService.getDentalVisitById(id);
@@ -42,7 +40,7 @@ public class DentalVisitsController {
           : new ResponseEntity<>(HttpStatus.NOT_FOUND);
     }
     
-    @PostMapping("/add-dental-visit")
+    @PostMapping("/add")
     @PreAuthorize("hasRole('DMD')")
     public ResponseEntity<String> createDentalVisits (
             @RequestParam("multipartFile") MultipartFile multipartFile,
@@ -103,7 +101,7 @@ public class DentalVisitsController {
         }
     }
 
-    @PutMapping("/update-dental-visit/{id}")
+    @PutMapping("/update/{id}")
     @PreAuthorize("hasRole('DMD')")
     public ResponseEntity<String> updateDentalVisits (
             @PathVariable int id,
@@ -194,7 +192,7 @@ public class DentalVisitsController {
         return null;
     }
 
-    @DeleteMapping("/delete-dental-visit/{id}")
+    @DeleteMapping("/delete/{id}")
     @PreAuthorize("hasRole('DMD')")
     public ResponseEntity<String> deleteDentalVisitById(@PathVariable int id) {
         try {
