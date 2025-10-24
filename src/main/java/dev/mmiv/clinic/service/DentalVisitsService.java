@@ -53,26 +53,32 @@ public class DentalVisitsService {
                 visit.getRespiratoryRate(),
                 visit.getSpo2(),
                 visit.getHistory(),
-                visit.getSymptoms(),
                 visit.getPhysicalExamFindings(),
                 visit.getDiagnosis(),
                 visit.getPlan(),
                 visit.getTreatment(),
                 visit.getDentalChartImage(),
+                visit.getDiagnosticTestResult(),
+                visit.getDiagnosticTestImage(),
                 p.getFirstName() + " " + p.getLastName(),
                 p.getBirthDate()
         );
     }
 
-    public void createDentalVisits(MultipartFile multipartFile, DentalVisitRequest dto) throws IOException {
+    public void createDentalVisits(MultipartFile chartFile,
+                                   MultipartFile diagnosticFile,
+                                   DentalVisitRequest dto) throws IOException {
         DentalVisits dentalVisits = new DentalVisits();
-        saveOrUpdateDentalVisit(dentalVisits, multipartFile, dto);
+        saveOrUpdateDentalVisit(dentalVisits, chartFile, diagnosticFile, dto);
     }
 
-    public void updateDentalVisits(int id, MultipartFile multipartFile, DentalVisitRequest dto) throws IOException {
+    public void updateDentalVisits(int id,
+                                   MultipartFile chartFile,
+                                   MultipartFile diagnosticFile,
+                                   DentalVisitRequest dto) throws IOException {
         DentalVisits dentalVisits = dentalVisitsRepository.findById(id)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Dental visit not found"));
-        saveOrUpdateDentalVisit(dentalVisits, multipartFile, dto);
+        saveOrUpdateDentalVisit(dentalVisits, chartFile, diagnosticFile, dto);
     }
 
     public void deleteDentalVisits(int id) {
@@ -83,7 +89,10 @@ public class DentalVisitsService {
         }
     }
 
-    private void saveOrUpdateDentalVisit(DentalVisits dentalVisits, MultipartFile multipartFile, DentalVisitRequest dto) throws IOException {
+    private void saveOrUpdateDentalVisit(DentalVisits dentalVisits,
+                                         MultipartFile chartFile,
+                                         MultipartFile diagnosticFile,
+                                         DentalVisitRequest dto) throws IOException {
         try {
             Patients patient = patientsRepository.findById(dto.getPatientId())
                     .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Patient not found"));
@@ -97,17 +106,18 @@ public class DentalVisitsService {
             dentalVisits.setRespiratoryRate(parseInt(dto.getRespiratoryRate()));
             dentalVisits.setSpo2(parseDouble(dto.getSpo2()));
             dentalVisits.setHistory(dto.getHistory());
-            dentalVisits.setSymptoms(dto.getSymptoms());
             dentalVisits.setPhysicalExamFindings(dto.getPhysicalExamFindings());
             dentalVisits.setDiagnosis(dto.getDiagnosis());
             dentalVisits.setPlan(dto.getPlan());
             dentalVisits.setTreatment(dto.getTreatment());
+            dentalVisits.setDiagnosticTestResult(dto.getDiagnosticTestResult());
             dentalVisits.setPatient(patient);
 
-            String imageFile = saveUploadedFile(multipartFile);
-            if (imageFile != null) {
-                dentalVisits.setDentalChartImage(imageFile);
-            }
+            String chartImage = saveUploadedFile(chartFile);
+            if (chartImage != null) dentalVisits.setDentalChartImage(chartImage);
+
+            String diagnosticImage = saveUploadedFile(diagnosticFile);
+            if (diagnosticImage != null) dentalVisits.setDiagnosticTestImage(diagnosticImage);
 
             dentalVisitsRepository.save(dentalVisits);
 
@@ -122,9 +132,7 @@ public class DentalVisitsService {
         if (multipartFile != null && !multipartFile.isEmpty()) {
             String rootPath = System.getProperty("user.dir");
             String uploadDir = rootPath + "/uploads";
-
-            File uploadDirFile = new File(uploadDir);
-            if (!uploadDirFile.exists()) uploadDirFile.mkdirs();
+            new File(uploadDir).mkdirs();
 
             String fileName = multipartFile.getOriginalFilename();
             String uploadPath = uploadDir + "/" + fileName;

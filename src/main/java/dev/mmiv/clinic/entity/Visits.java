@@ -39,9 +39,6 @@ public abstract class Visits {
     private String history;
 
     @Column(columnDefinition = "TEXT")
-    private String symptoms;
-
-    @Column(columnDefinition = "TEXT")
     private String physicalExamFindings;
 
     @Column(columnDefinition = "TEXT")
@@ -53,8 +50,13 @@ public abstract class Visits {
     @Column(columnDefinition = "TEXT")
     private String treatment;
 
+    @Column(columnDefinition = "TEXT")
+    private String diagnosticTestResult;
+
+    private String diagnosticTestImage;
+
     @JsonIgnore
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "patient_id", nullable = false)
     private Patients patient;
 }

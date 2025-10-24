@@ -22,25 +22,25 @@ public class MedicalVisitsController {
     private final MedicalVisitsService medicalVisitsService;
 
     @GetMapping
-    @PreAuthorize("hasRole('MD') or hasRole('DMD') or hasRole('NURSE')")
+    @PreAuthorize("hasAnyRole('MD', 'DMD', 'NURSE')")
     public ResponseEntity<List<MedicalVisits>> getAll() {
         return ResponseEntity.ok(medicalVisitsService.getMedicalVisits());
     }
 
     @GetMapping("/{id}")
     @PreAuthorize("hasAnyRole('MD', 'DMD', 'NURSE')")
-    public ResponseEntity<MedicalVisitResponse> getMedicalVisitById(@PathVariable int id) {
-        MedicalVisitResponse response = medicalVisitsService.getMedicalVisitResponseById(id);
-        return ResponseEntity.ok(response);
+    public ResponseEntity<MedicalVisitResponse> getById(@PathVariable int id) {
+        return ResponseEntity.ok(medicalVisitsService.getMedicalVisitResponseById(id));
     }
 
     @PostMapping("/add")
     @PreAuthorize("hasRole('MD')")
     public ResponseEntity<String> add(
-            @RequestParam("multipartFile") MultipartFile multipartFile,
+            @RequestParam(value = "chartFile", required = false) MultipartFile chartFile,
+            @RequestParam(value = "diagnosticFile", required = false) MultipartFile diagnosticFile,
             @ModelAttribute MedicalVisitRequest request
     ) throws IOException {
-        medicalVisitsService.createMedicalVisits(multipartFile, request);
+        medicalVisitsService.createMedicalVisits(chartFile, diagnosticFile, request);
         return ResponseEntity.ok("Medical visit successfully created.");
     }
 
@@ -48,10 +48,11 @@ public class MedicalVisitsController {
     @PreAuthorize("hasRole('MD')")
     public ResponseEntity<String> update(
             @PathVariable int id,
-            @RequestParam("multipartFile") MultipartFile multipartFile,
+            @RequestParam(value = "chartFile", required = false) MultipartFile chartFile,
+            @RequestParam(value = "diagnosticFile", required = false) MultipartFile diagnosticFile,
             @ModelAttribute MedicalVisitRequest request
     ) throws IOException {
-        medicalVisitsService.updateMedicalVisits(id, multipartFile, request);
+        medicalVisitsService.updateMedicalVisits(id, chartFile, diagnosticFile, request);
         return ResponseEntity.ok("Medical visit successfully updated.");
     }
 

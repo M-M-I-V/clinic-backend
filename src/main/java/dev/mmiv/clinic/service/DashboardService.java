@@ -18,8 +18,8 @@ public class DashboardService {
 
     public Map<String, Long> getKpis() {
         return Map.of(
-            "todayVisits", visitsRepository.countTodayVisits(),
-            "monthVisits", visitsRepository.countMonthVisits()
+                "todaysVisits", visitsRepository.countTodayVisits(),
+                "visitsThisMonth", visitsRepository.countMonthVisits()
         );
     }
 

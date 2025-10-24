@@ -13,7 +13,6 @@ public record MedicalVisitResponse(
         Integer respiratoryRate,
         Double spo2,
         String history,
-        String symptoms,
         String physicalExamFindings,
         String diagnosis,
         String plan,
@@ -21,6 +20,9 @@ public record MedicalVisitResponse(
         String hama,
         String referralForm,
         String medicalChartImage,
+        String diagnosticTestResult,
+        String diagnosticTestImage,
+        String nursesNotes,
         String fullName,
         LocalDate birthDate
 ) {}

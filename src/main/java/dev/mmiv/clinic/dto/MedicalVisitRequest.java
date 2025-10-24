@@ -25,4 +25,6 @@ public class MedicalVisitRequest {
     private int patientId;
     private String hama;
     private String referralForm;
+    private String diagnosticTestResult;
+    private String nursesNotes;
 }

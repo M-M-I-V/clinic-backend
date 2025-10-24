@@ -54,7 +54,6 @@ public class MedicalVisitsService {
                 visit.getRespiratoryRate(),
                 visit.getSpo2(),
                 visit.getHistory(),
-                visit.getSymptoms(),
                 visit.getPhysicalExamFindings(),
                 visit.getDiagnosis(),
                 visit.getPlan(),
@@ -62,20 +61,28 @@ public class MedicalVisitsService {
                 visit.getHama(),
                 visit.getReferralForm(),
                 visit.getMedicalChartImage(),
+                visit.getDiagnosticTestResult(),
+                visit.getDiagnosticTestImage(),
+                visit.getNursesNotes(),
                 p.getFirstName() + " " + p.getLastName(),
                 p.getBirthDate()
         );
     }
 
-    public void createMedicalVisits(MultipartFile multipartFile, MedicalVisitRequest dto) throws IOException {
+    public void createMedicalVisits(MultipartFile chartFile,
+                                    MultipartFile diagnosticFile,
+                                    MedicalVisitRequest dto) throws IOException {
         MedicalVisits medicalVisits = new MedicalVisits();
-        saveOrUpdateMedicalVisit(medicalVisits, multipartFile, dto);
+        saveOrUpdateMedicalVisit(medicalVisits, chartFile, diagnosticFile, dto);
     }
 
-    public void updateMedicalVisits(int id, MultipartFile multipartFile, MedicalVisitRequest dto) throws IOException {
+    public void updateMedicalVisits(int id,
+                                    MultipartFile chartFile,
+                                    MultipartFile diagnosticFile,
+                                    MedicalVisitRequest dto) throws IOException {
         MedicalVisits medicalVisits = medicalVisitsRepository.findById(id)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Medical visit not found"));
-        saveOrUpdateMedicalVisit(medicalVisits, multipartFile, dto);
+        saveOrUpdateMedicalVisit(medicalVisits, chartFile, diagnosticFile, dto);
     }
 
     public void deleteMedicalVisits(int id) {
@@ -87,7 +94,8 @@ public class MedicalVisitsService {
     }
 
     private void saveOrUpdateMedicalVisit(MedicalVisits medicalVisits,
-                                          MultipartFile multipartFile,
+                                          MultipartFile chartFile,
+                                          MultipartFile diagnosticFile,
                                           MedicalVisitRequest dto) throws IOException {
         try {
             Patients patient = patientsRepository.findById(dto.getPatientId())
@@ -102,19 +110,21 @@ public class MedicalVisitsService {
             medicalVisits.setRespiratoryRate(parseInt(dto.getRespiratoryRate()));
             medicalVisits.setSpo2(parseDouble(dto.getSpo2()));
             medicalVisits.setHistory(dto.getHistory());
-            medicalVisits.setSymptoms(dto.getSymptoms());
             medicalVisits.setPhysicalExamFindings(dto.getPhysicalExamFindings());
             medicalVisits.setDiagnosis(dto.getDiagnosis());
             medicalVisits.setPlan(dto.getPlan());
             medicalVisits.setTreatment(dto.getTreatment());
             medicalVisits.setHama(dto.getHama());
             medicalVisits.setReferralForm(dto.getReferralForm());
+            medicalVisits.setDiagnosticTestResult(dto.getDiagnosticTestResult());
+            medicalVisits.setNursesNotes(dto.getNursesNotes());
             medicalVisits.setPatient(patient);
 
-            String imageFile = saveUploadedFile(multipartFile);
-            if (imageFile != null) {
-                medicalVisits.setMedicalChartImage(imageFile);
-            }
+            String chartImage = saveUploadedFile(chartFile);
+            if (chartImage != null) medicalVisits.setMedicalChartImage(chartImage);
+
+            String diagnosticImage = saveUploadedFile(diagnosticFile);
+            if (diagnosticImage != null) medicalVisits.setDiagnosticTestImage(diagnosticImage);
 
             medicalVisitsRepository.save(medicalVisits);
 
@@ -129,9 +139,7 @@ public class MedicalVisitsService {
         if (multipartFile != null && !multipartFile.isEmpty()) {
             String rootPath = System.getProperty("user.dir");
             String uploadDir = rootPath + "/uploads";
-
-            File uploadDirFile = new File(uploadDir);
-            if (!uploadDirFile.exists()) uploadDirFile.mkdirs();
+            new File(uploadDir).mkdirs();
 
             String fileName = multipartFile.getOriginalFilename();
             String uploadPath = uploadDir + "/" + fileName;

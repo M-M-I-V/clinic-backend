@@ -1,7 +1,9 @@
 package dev.mmiv.clinic.controller;
 
+import dev.mmiv.clinic.dto.UserList;
 import dev.mmiv.clinic.entity.Users;
 import dev.mmiv.clinic.service.UsersService;
+import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -9,56 +11,61 @@ import org.springframework.web.server.ResponseStatusException;
 import org.springframework.security.access.prepost.PreAuthorize;
 
 import java.util.List;
+import java.util.NoSuchElementException;
 
 @RestController
-@RequestMapping("/api/admin")
+@RequestMapping("/api/admin/users")
 @CrossOrigin(origins = "http://localhost:3000", allowCredentials = "true")
+@RequiredArgsConstructor
+@PreAuthorize("hasRole('ADMIN')")
 public class UsersController {
 
-    UsersService usersService;
+    private final UsersService usersService;
 
-    public UsersController(UsersService usersService) {
-        this.usersService = usersService;
-    }
-
-    @PostMapping("/add-user")
-    @PreAuthorize("hasRole('ADMIN')")
+    @PostMapping("/add")
     public ResponseEntity<String> addUser(@RequestBody Users user) {
         usersService.createUser(user);
-        return ResponseEntity.ok().build();
+        return ResponseEntity.ok("User successfully created.");
     }
 
-    @GetMapping("/users")
-    @PreAuthorize("hasRole('ADMIN')")
+    @GetMapping
     public ResponseEntity<List<Users>> getUsers() {
-        return new ResponseEntity<>(usersService.getUsers(), HttpStatus.OK);
+        return ResponseEntity.ok(usersService.getUsers());
     }
 
-    @GetMapping("/users/{id}")
-    @PreAuthorize("hasRole('ADMIN')")
+    @GetMapping("/{id}")
     public ResponseEntity<Users> getUserById(@PathVariable int id) {
-        return new ResponseEntity<>(usersService.getUserById(id), HttpStatus.OK);
+        Users user = usersService.getUserById(id);
+        return user != null
+                ? ResponseEntity.ok(user)
+                : ResponseEntity.notFound().build();
     }
 
-    @PutMapping("/update-user/{id}")
-    @PreAuthorize("hasRole('ADMIN')")
+    @GetMapping("/list")
+    @PreAuthorize("hasAnyRole('MD', 'DMD', 'NURSE', 'ADMIN')")
+    public ResponseEntity<List<UserList>> getUsersList() {
+        return ResponseEntity.ok(usersService.getUsersList());
+    }
+
+    @PutMapping("/update/{id}")
     public ResponseEntity<String> updateUser(@PathVariable int id, @RequestBody Users user) {
-        usersService.updateUser(user);
-        return ResponseEntity.ok().build();
+        try {
+            usersService.updateUser(id, user);
+            return ResponseEntity.ok("User successfully updated.");
+        } catch (NoSuchElementException e) {
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "User not found", e);
+        }
     }
 
-    @DeleteMapping("/delete-user/{id}")
-    @PreAuthorize("hasRole('ADMIN')")
+    @DeleteMapping("/delete/{id}")
     public ResponseEntity<String> deleteUser(@PathVariable int id) {
         try {
             usersService.deleteUserById(id);
-            return ResponseEntity.ok().build();
-
-        } catch(IllegalArgumentException e) {
-            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, e.getMessage(), e.getCause());
-
-        } catch(Exception e) {
-            throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, e.getMessage(), e.getCause());
+            return ResponseEntity.ok("User successfully deleted.");
+        } catch (IllegalArgumentException e) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, e.getMessage(), e);
+        } catch (Exception e) {
+            throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "Unexpected error", e);
         }
     }
 }

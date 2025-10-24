@@ -3,26 +3,24 @@ package dev.mmiv.clinic.controller;
 import dev.mmiv.clinic.dto.VisitsList;
 import dev.mmiv.clinic.entity.Visits;
 import dev.mmiv.clinic.service.VisitsService;
+import jakarta.servlet.http.HttpServletResponse;
+import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.CrossOrigin;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.web.multipart.MultipartFile;
 
+import java.io.IOException;
 import java.util.List;
 
 @RestController
 @RequestMapping("/api")
+@RequiredArgsConstructor
 @CrossOrigin(origins = "http://localhost:3000", allowCredentials = "true")
 public class VisitsController {
 
-    VisitsService visitsService;
-
-    public VisitsController(VisitsService visitsService) {
-        this.visitsService = visitsService;
-    }
+    private final VisitsService visitsService;
 
     @GetMapping("/visits")
     @PreAuthorize("hasAnyRole('MD', 'DMD', 'NURSE')")
@@ -34,5 +32,24 @@ public class VisitsController {
     @PreAuthorize("hasAnyRole('MD', 'DMD', 'NURSE')")
     public ResponseEntity<List<VisitsList>> getVisitsList() {
         return ResponseEntity.ok(visitsService.getVisitsList());
+    }
+
+    @GetMapping("/visits-list/patient/{id}")
+    @PreAuthorize("hasAnyRole('MD', 'DMD', 'NURSE')")
+    public ResponseEntity<List<VisitsList>> getVisitsListByPatient(@PathVariable int id) {
+        return ResponseEntity.ok(visitsService.getVisitsListByPatientId(id));
+    }
+
+    @PostMapping("/visits/import")
+    @PreAuthorize("hasAnyRole('MD', 'DMD', 'NURSE')")
+    public ResponseEntity<String> importVisits(@RequestParam("file") MultipartFile file) throws IOException {
+        visitsService.importVisits(file);
+        return ResponseEntity.ok("Visits imported successfully!");
+    }
+
+    @GetMapping("/visits/export")
+    @PreAuthorize("hasAnyRole('MD', 'DMD', 'NURSE')")
+    public void exportVisits(HttpServletResponse response) throws IOException {
+        visitsService.exportVisits(response);
     }
 }

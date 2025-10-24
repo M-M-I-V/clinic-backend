@@ -1,12 +1,15 @@
 package dev.mmiv.clinic.service;
 
+import dev.mmiv.clinic.dto.UserList;
 import dev.mmiv.clinic.entity.Users;
 import dev.mmiv.clinic.repository.UsersRepository;
+import org.springframework.http.HttpStatus;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.web.server.ResponseStatusException;
 
 import java.util.List;
 
@@ -33,7 +36,6 @@ public class UsersService {
         );
 
         if (authentication.isAuthenticated()) {
-            // Fetch full user from DB so we also get the role
             Users dbUser = usersRepository.findByUsername(user.getUsername());
             if (dbUser == null) {
                 throw new RuntimeException("User not found");
@@ -45,6 +47,10 @@ public class UsersService {
     }
 
     public void createUser(Users user) {
+        if (usersRepository.findByUsername(user.getUsername()) != null) {
+            throw new ResponseStatusException(HttpStatus.CONFLICT, "Username already exists");
+        }
+
         user.setPassword(bCryptPasswordEncoder.encode(user.getPassword()));
         usersRepository.save(user);
     }
@@ -54,15 +60,43 @@ public class UsersService {
     }
 
     public Users getUserById(int id) {
-        return usersRepository.findById(id).orElse(null);
+        return usersRepository.findById(id)
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "User not found"));
     }
 
-    public void updateUser(Users user) {
-        user.setPassword(bCryptPasswordEncoder.encode(user.getPassword()));
-        usersRepository.save(user);
+    public List<UserList> getUsersList() {
+        return usersRepository.findAll().stream()
+                .map(user -> new UserList(
+                        user.getId(),
+                        user.getUsername(),
+                        user.getRole().name()
+                ))
+                .toList();
+    }
+
+    public void updateUser(int id, Users updatedUser) {
+        Users existingUser = usersRepository.findById(id)
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "User not found"));
+
+        Users sameUsernameUser = usersRepository.findByUsername(updatedUser.getUsername());
+        if (sameUsernameUser != null && sameUsernameUser.getId() != id) {
+            throw new ResponseStatusException(HttpStatus.CONFLICT, "Username already in use");
+        }
+
+        existingUser.setUsername(updatedUser.getUsername());
+        existingUser.setRole(updatedUser.getRole());
+
+        if (!bCryptPasswordEncoder.matches(updatedUser.getPassword(), existingUser.getPassword())) {
+            existingUser.setPassword(bCryptPasswordEncoder.encode(updatedUser.getPassword()));
+        }
+
+        usersRepository.save(existingUser);
     }
 
     public void deleteUserById(int id) {
+        if (!usersRepository.existsById(id)) {
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "User not found");
+        }
         usersRepository.deleteById(id);
     }
 }

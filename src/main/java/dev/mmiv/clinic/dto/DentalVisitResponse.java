@@ -13,12 +13,13 @@ public record DentalVisitResponse(
         Integer respiratoryRate,
         Double spo2,
         String history,
-        String symptoms,
         String physicalExamFindings,
         String diagnosis,
         String plan,
         String treatment,
         String dentalChartImage,
-        String fullName,
+        String diagnosticTestResult,
+        String diagnosticTestImage,
+        String patientName,
         LocalDate birthDate
 ) {}

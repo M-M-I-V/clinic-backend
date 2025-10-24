@@ -8,7 +8,7 @@ public record VisitsList(
         LocalDate birthDate,
         LocalDate visitDate,
         String visitType,
-        String symptoms,
+        String chiefComplaint,
         String physicalExamFindings,
         String diagnosis,
         String treatment

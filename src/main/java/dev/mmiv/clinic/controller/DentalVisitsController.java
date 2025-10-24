@@ -30,18 +30,18 @@ public class DentalVisitsController {
 
     @GetMapping("/{id}")
     @PreAuthorize("hasAnyRole('MD', 'DMD', 'NURSE')")
-    public ResponseEntity<DentalVisitResponse> getDentalVisitById(@PathVariable int id) {
-        DentalVisitResponse response = dentalVisitsService.getDentalVisitResponseById(id);
-        return ResponseEntity.ok(response);
+    public ResponseEntity<DentalVisitResponse> getById(@PathVariable int id) {
+        return ResponseEntity.ok(dentalVisitsService.getDentalVisitResponseById(id));
     }
 
     @PostMapping("/add")
     @PreAuthorize("hasRole('DMD')")
     public ResponseEntity<String> add(
-            @RequestParam("multipartFile") MultipartFile multipartFile,
+            @RequestParam(value = "chartFile", required = false) MultipartFile chartFile,
+            @RequestParam(value = "diagnosticFile", required = false) MultipartFile diagnosticFile,
             @ModelAttribute DentalVisitRequest request
     ) throws IOException {
-        dentalVisitsService.createDentalVisits(multipartFile, request);
+        dentalVisitsService.createDentalVisits(chartFile, diagnosticFile, request);
         return ResponseEntity.ok("Dental visit successfully created.");
     }
 
@@ -49,10 +49,11 @@ public class DentalVisitsController {
     @PreAuthorize("hasRole('DMD')")
     public ResponseEntity<String> update(
             @PathVariable int id,
-            @RequestParam("multipartFile") MultipartFile multipartFile,
+            @RequestParam(value = "chartFile", required = false) MultipartFile chartFile,
+            @RequestParam(value = "diagnosticFile", required = false) MultipartFile diagnosticFile,
             @ModelAttribute DentalVisitRequest request
     ) throws IOException {
-        dentalVisitsService.updateDentalVisits(id, multipartFile, request);
+        dentalVisitsService.updateDentalVisits(id, chartFile, diagnosticFile, request);
         return ResponseEntity.ok("Dental visit successfully updated.");
     }
 

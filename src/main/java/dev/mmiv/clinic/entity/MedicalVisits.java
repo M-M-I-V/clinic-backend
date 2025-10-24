@@ -1,5 +1,6 @@
 package dev.mmiv.clinic.entity;
 
+import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -16,4 +17,7 @@ public class MedicalVisits extends Visits {
     private String hama;
     private String referralForm;
     private String medicalChartImage;
+
+    @Column(columnDefinition = "TEXT")
+    private String nursesNotes;
 }
